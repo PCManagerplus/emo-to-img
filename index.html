@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>絵文字画像変換</title>
+    <!-- Materialize CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <style>
+        #emojiCanvas {
+            border: 1px solid #000;
+            margin-top: 20px;
+        }
+        .container {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="center-align">絵文字を画像に変換</h1>
+        <div class="input-field">
+            <textarea id="emojiInput" class="materialize-textarea" placeholder="ここに絵文字を入力してください..."></textarea>
+            <label for="emojiInput">絵文字入力</label>
+        </div>
+        <div class="input-field col s12">
+            <select id="fontSelector">
+                <option value="seguiemj2" selected>Segui Emoji</option>
+                <option value="notoemoji">Noto Color Emoji</option>
+            </select>
+            <label>フォントを選択</label>
+        </div>
+        <div class="input-field col s12">
+            <select id="qualitySelector">
+                <option value="1" selected>標準画質</option>
+                <option value="2">高画質</option>
+                <option value="3">超高画質</option>
+            </select>
+            <label>画質を選択</label>
+        </div>
+        <a class="waves-effect waves-light btn-large" onclick="generateImage()">画像に変換</a>
+        <a class="waves-effect waves-light btn-large red" onclick="exportImage()">画像をエクスポート</a>
+        <canvas id="emojiCanvas"></canvas>
+    </div>
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            M.FormSelect.init(document.querySelectorAll('select'));
+        });
+
+        function generateImage() {
+            const canvas = document.getElementById('emojiCanvas');
+            const ctx = canvas.getContext('2d');
+            const emojiInput = document.getElementById('emojiInput').value;
+            const fontSelector = document.getElementById('fontSelector').value;
+
+            // フォント設定
+            const fonts = {
+                'seguiemj2': 'seguiemj2.ttf',
+                'notoemoji': 'NotoColorEmoji-Regular.ttf'
+            };
+
+            canvas.width = 300; // 基本サイズ
+            canvas.height = 100; // 基本サイズ
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // フォントの読み込みと描画
+            const font = new FontFace('emojiFont', `url(${fonts[fontSelector]})`);
+            font.load().then(function (loadedFont) {
+                document.fonts.add(loadedFont);
+                ctx.font = '48px emojiFont';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(emojiInput, canvas.width / 2, canvas.height / 2);
+            }).catch(function (error) {
+                console.error('フォントの読み込みに失敗しました:', error);
+            });
+        }
+
+        function exportImage() {
+            const canvas = document.getElementById('emojiCanvas');
+            const qualitySelector = document.getElementById('qualitySelector').value;
+            const scale = parseInt(qualitySelector);
+
+            // 拡大設定
+            const originalWidth = 300;
+            const originalHeight = 100;
+            canvas.width = originalWidth * scale;
+            canvas.height = originalHeight * scale;
+
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const emojiInput = document.getElementById('emojiInput').value;
+            const fontSelector = document.getElementById('fontSelector').value;
+            const fonts = {
+                'seguiemj2': 'seguiemj2.ttf',
+                'notoemoji': 'NotoColorEmoji-Regular.ttf'
+            };
+
+            const font = new FontFace('emojiFont', `url(${fonts[fontSelector]})`);
+            font.load().then(function (loadedFont) {
+                document.fonts.add(loadedFont);
+                ctx.font = `${48 * scale}px emojiFont`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(emojiInput, canvas.width / 2, canvas.height / 2);
+
+                // エクスポート処理
+                const dataURL = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.href = dataURL;
+                link.download = prompt('画像の名前を入力してください:', 'emoji.png');
+                link.click();
+            }).catch(function (error) {
+                console.error('フォントの読み込みに失敗しました:', error);
+            });
+        }
+    </script>
+</body>
+</html>
