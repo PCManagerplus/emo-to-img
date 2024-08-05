@@ -14,13 +14,17 @@
         .container {
             margin-top: 30px;
         }
+        .modal {
+            width: 80%;
+            max-width: 600px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1 class="center-align">絵文字を画像に変換</h1>
         <div class="input-field">
-            <textarea id="emojiInput" class="materialize-textarea" placeholder="ここに絵文字を入力してください..."></textarea>
+            <textarea id="emojiInput" class="materialize-textarea" maxlength="1" placeholder="ここに絵文字を入力してください..."></textarea>
             <label for="emojiInput">絵文字入力</label>
         </div>
         <div class="input-field col s12">
@@ -39,14 +43,28 @@
             <label>画質を選択</label>
         </div>
         <a class="waves-effect waves-light btn-large" onclick="generateImage()">画像に変換</a>
-        <a class="waves-effect waves-light btn-large red" onclick="exportImage()">画像をエクスポート</a>
+        <a class="waves-effect waves-light btn-large red" onclick="showExportDialog()">画像をエクスポート</a>
         <canvas id="emojiCanvas"></canvas>
     </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal" class="modal">
+        <div class="modal-content">
+            <h4>画像の名前を入力</h4>
+            <input type="text" id="fileNameInput" placeholder="画像の名前">
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="modal-close waves-effect waves-green btn-flat" onclick="exportImage()">保存</a>
+            <a href="#" class="modal-close waves-effect waves-red btn-flat">キャンセル</a>
+        </div>
+    </div>
+
     <!-- Materialize JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             M.FormSelect.init(document.querySelectorAll('select'));
+            M.Modal.init(document.querySelectorAll('.modal'));
         });
 
         function generateImage() {
@@ -55,21 +73,28 @@
             const emojiInput = document.getElementById('emojiInput').value;
             const fontSelector = document.getElementById('fontSelector').value;
 
+            if (emojiInput.length !== 1) {
+                alert('1文字の絵文字を入力してください。');
+                return;
+            }
+
+            const size = 300; // 1:1の画像サイズ
+
             // フォント設定
             const fonts = {
                 'seguiemj2': 'seguiemj2.ttf',
                 'notoemoji': 'NotoColorEmoji-Regular.ttf'
             };
 
-            canvas.width = 300; // 基本サイズ
-            canvas.height = 100; // 基本サイズ
+            canvas.width = size;
+            canvas.height = size;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // フォントの読み込みと描画
             const font = new FontFace('emojiFont', `url(${fonts[fontSelector]})`);
             font.load().then(function (loadedFont) {
                 document.fonts.add(loadedFont);
-                ctx.font = '48px emojiFont';
+                ctx.font = `${size * 0.6}px emojiFont`; // フォントサイズを画像サイズに合わせる
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(emojiInput, canvas.width / 2, canvas.height / 2);
@@ -78,17 +103,22 @@
             });
         }
 
+        function showExportDialog() {
+            const modal = M.Modal.getInstance(document.getElementById('exportModal'));
+            modal.open();
+        }
+
         function exportImage() {
             const canvas = document.getElementById('emojiCanvas');
             const qualitySelector = document.getElementById('qualitySelector').value;
             const scale = parseInt(qualitySelector);
+            const fileName = document.getElementById('fileNameInput').value || 'emoji.png';
+
+            const size = 300; // 基本サイズ
 
             // 拡大設定
-            const originalWidth = 300;
-            const originalHeight = 100;
-            canvas.width = originalWidth * scale;
-            canvas.height = originalHeight * scale;
-
+            canvas.width = size * scale;
+            canvas.height = size * scale;
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const emojiInput = document.getElementById('emojiInput').value;
@@ -101,7 +131,7 @@
             const font = new FontFace('emojiFont', `url(${fonts[fontSelector]})`);
             font.load().then(function (loadedFont) {
                 document.fonts.add(loadedFont);
-                ctx.font = `${48 * scale}px emojiFont`;
+                ctx.font = `${size * 0.6 * scale}px emojiFont`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(emojiInput, canvas.width / 2, canvas.height / 2);
@@ -110,7 +140,7 @@
                 const dataURL = canvas.toDataURL('image/png');
                 const link = document.createElement('a');
                 link.href = dataURL;
-                link.download = prompt('画像の名前を入力してください:', 'emoji.png');
+                link.download = fileName;
                 link.click();
             }).catch(function (error) {
                 console.error('フォントの読み込みに失敗しました:', error);
