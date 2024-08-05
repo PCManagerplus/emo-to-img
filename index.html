@@ -24,7 +24,7 @@
     <div class="container">
         <h1 class="center-align">絵文字を画像に変換</h1>
         <div class="input-field">
-            <input type="text" id="emojiInput" maxlength="1" placeholder="ここに絵文字を入力してください...">
+            <input type="text" id="emojiInput" maxlength="1" placeholder="ここに絵文字を入力してください..." />
             <label for="emojiInput">絵文字入力</label>
         </div>
         <div class="input-field col s12">
@@ -100,6 +100,7 @@
                 ctx.fillText(emojiInput, canvas.width / 2, canvas.height / 2);
             }).catch(function (error) {
                 console.error('フォントの読み込みに失敗しました:', error);
+                alert('フォントの読み込みに失敗しました。');
             });
         }
 
@@ -144,6 +145,7 @@
                 link.click();
             }).catch(function (error) {
                 console.error('フォントの読み込みに失敗しました:', error);
+                alert('フォントの読み込みに失敗しました。');
             });
         }
     </script>
