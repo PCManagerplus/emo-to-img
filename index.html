@@ -18,6 +18,14 @@
             width: 80%;
             max-width: 600px;
         }
+        #notification {
+            display: none;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -44,8 +52,9 @@
         </div>
         <a class="waves-effect waves-light btn-large" onclick="generateImage()">画像に変換</a>
         <a class="waves-effect waves-light btn-large red" onclick="showExportDialog()">画像をエクスポート</a>
-        <a class="waves-effect waves-light btn-large teal" onclick="copyToClipboard()">クリップボードにコピー</a>
+        <a class="waves-effect waves-light btn-large teal" onclick="copyToClipboard()">画像をクリップボードにコピー</a>
         <canvas id="emojiCanvas"></canvas>
+        <div id="notification">画像がクリップボードにコピーされました！</div>
     </div>
 
     <!-- Export Modal -->
@@ -174,19 +183,29 @@
         }
 
         function copyToClipboard() {
-            const emojiInput = document.getElementById('emojiInput').value;
-            if (emojiInput.trim() === '') {
-                alert('絵文字やテキストを入力してください。');
-                return;
-            }
+            const canvas = document.getElementById('emojiCanvas');
 
-            // テキストをクリップボードにコピー
-            navigator.clipboard.writeText(emojiInput).then(() => {
-                alert('クリップボードにコピーしました!');
-            }).catch(err => {
-                console.error('コピーに失敗しました:', err);
-                alert('コピーに失敗しました。');
+            canvas.toBlob(blob => {
+                const clipboardItem = new ClipboardItem({ 'image/png': blob });
+
+                navigator.clipboard.write([clipboardItem])
+                    .then(() => {
+                        showNotification('画像がクリップボードにコピーされました！');
+                    })
+                    .catch(err => {
+                        console.error('クリップボードへのコピーに失敗しました:', err);
+                        showNotification('クリップボードへのコピーに失敗しました。');
+                    });
             });
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000); // 3秒後に通知を非表示にする
         }
     </script>
 </body>
