@@ -44,6 +44,7 @@
         </div>
         <a class="waves-effect waves-light btn-large" onclick="generateImage()">画像に変換</a>
         <a class="waves-effect waves-light btn-large red" onclick="showExportDialog()">画像をエクスポート</a>
+        <a class="waves-effect waves-light btn-large teal" onclick="copyToClipboard()">クリップボードにコピー</a>
         <canvas id="emojiCanvas"></canvas>
     </div>
 
@@ -60,7 +61,8 @@
     </div>
 
     <!-- 音声ファイル -->
-    <audio id="soundEffect" src="パフ.mp3"></audio>
+    <audio id="soundEffect" src="puff.mp3"></audio>
+    <audio id="clickSound" src="https://pcmanagerplus.github.io/media.web/andTV/ui/pano_click.ogg"></audio>
 
     <!-- Materialize JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
@@ -70,7 +72,13 @@
             M.Modal.init(document.querySelectorAll('.modal'));
         });
 
+        function playClickSound() {
+            const clickSound = document.getElementById('clickSound');
+            clickSound.play();
+        }
+
         function generateImage() {
+            playClickSound();
             const canvas = document.getElementById('emojiCanvas');
             const ctx = canvas.getContext('2d');
             const emojiInput = document.getElementById('emojiInput').value;
@@ -120,11 +128,13 @@
         }
 
         function showExportDialog() {
+            playClickSound();
             const modal = M.Modal.getInstance(document.getElementById('exportModal'));
             modal.open();
         }
 
         function exportImage() {
+            playClickSound();
             const canvas = document.getElementById('emojiCanvas');
             const qualitySelector = document.getElementById('qualitySelector').value;
             const scale = parseInt(qualitySelector);
@@ -169,6 +179,23 @@
             }).catch(function (error) {
                 console.error('フォントの読み込みに失敗しました:', error);
                 alert('フォントの読み込みに失敗しました。');
+            });
+        }
+
+        function copyToClipboard() {
+            playClickSound();
+            const emojiInput = document.getElementById('emojiInput').value;
+            if (emojiInput.trim() === '') {
+                alert('絵文字やテキストを入力してください。');
+                return;
+            }
+
+            // テキストをクリップボードにコピー
+            navigator.clipboard.writeText(emojiInput).then(() => {
+                alert('クリップボードにコピーしました!');
+            }).catch(err => {
+                console.error('コピーに失敗しました:', err);
+                alert('コピーに失敗しました。');
             });
         }
     </script>
