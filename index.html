@@ -26,6 +26,22 @@
             color: white;
             border-radius: 5px;
         }
+        @font-face {
+            font-family: 'emojiFont';
+            src: url('seguiemj2.ttf');
+        }
+        @font-face {
+            font-family: 'emojiFontNoto';
+            src: url('NotoColorEmoji-Regular.ttf');
+        }
+        @font-face {
+            font-family: 'emojiFontSwiftUI';
+            src: url('Emoji-SwiftUIFlat15.1.ttf');
+        }
+        @font-face {
+            font-family: 'emojiFontBlob';
+            src: url('Blob_v15.1.ttf');
+        }
     </style>
 </head>
 <body>
@@ -39,6 +55,8 @@
             <select id="fontSelector">
                 <option value="seguiemj2" selected>Segui Emoji</option>
                 <option value="notoemoji">Noto Color Emoji</option>
+                <option value="swiftui">Emoji-SwiftUIFlat15.1</option>
+                <option value="blob">Blob_v15.1</option>
             </select>
             <label>フォントを選択</label>
         </div>
@@ -96,7 +114,9 @@
             // フォント設定
             const fonts = {
                 'seguiemj2': 'seguiemj2.ttf',
-                'notoemoji': 'NotoColorEmoji-Regular.ttf'
+                'notoemoji': 'NotoColorEmoji-Regular.ttf',
+                'swiftui': 'Emoji-SwiftUIFlat15.1.ttf',
+                'blob': 'Blob_v15.1.ttf'
             };
 
             canvas.width = size;
@@ -151,7 +171,9 @@
             const fontSelector = document.getElementById('fontSelector').value;
             const fonts = {
                 'seguiemj2': 'seguiemj2.ttf',
-                'notoemoji': 'NotoColorEmoji-Regular.ttf'
+                'notoemoji': 'NotoColorEmoji-Regular.ttf',
+                'swiftui': 'Emoji-SwiftUIFlat15.1.ttf',
+                'blob': 'Blob_v15.1.ttf'
             };
 
             const font = new FontFace('emojiFont', `url(${fonts[fontSelector]})`);
